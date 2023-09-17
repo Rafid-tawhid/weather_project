@@ -10,10 +10,13 @@ import 'package:http/http.dart';
 
 import '../helpers/constants.dart';
 import '../models/current_response_model.dart';
+import '../models/forecast_response_model.dart';
+
 
 class WeatherProvider extends ChangeNotifier{
   CurrentResponseModel? currentResponseModel;
-  // ForecastResponseModel? forecastResponseModel;
+  ForecastModel? forecastResponseModel;
+  List<ForecastList> forecastList=[];
   double latitude = 0.0, longitude = 0.0;
   String unit = 'metric';
   String unitSymbol = celsius;
@@ -45,7 +48,7 @@ class WeatherProvider extends ChangeNotifier{
 
   getWeatherData() {
     _getCurrentData();
-    // _getForecastData();
+    _getForecastData();
   }
 
   void convertAddressToLatLng(String result) async {
@@ -82,20 +85,23 @@ class WeatherProvider extends ChangeNotifier{
     }
   }
 
-// void _getForecastData() async {
-//   final uri = Uri.parse('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=$unit&appid=$weather_api_key');
-//   try {
-//     final response = await get(uri);
-//     final map = jsonDecode(response.body);
-//     if(response.statusCode == 200) {
-//       forecastResponseModel = ForecastResponseModel.fromJson(map);
-//       print(forecastResponseModel!.list!.length);
-//       notifyListeners();
-//     } else {
-//       print(map['message']);
-//     }
-//   }catch(error) {
-//     rethrow;
-//   }
-// }
+void _getForecastData() async {
+  final uri = Uri.parse('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=$unit&appid=$weather_api_key');
+  try {
+    final response = await get(uri);
+    final map = jsonDecode(response.body);
+    if(response.statusCode == 200) {
+      forecastResponseModel = ForecastModel.fromJson(map);
+      for(Map<String,dynamic> i in map['list']){
+        forecastList.add(ForecastList.fromJson(i));
+      }
+      print(forecastList.length);
+      notifyListeners();
+    } else {
+      print(map['message']);
+    }
+  }catch(error) {
+    rethrow;
+  }
+}
 }
