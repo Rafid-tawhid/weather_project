@@ -4,7 +4,12 @@ import 'package:weather_project/page/weather_page.dart';
 import 'package:weather_project/providers/weather_provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_)=>WeatherProvider())
+      ],
+      child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -13,11 +18,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider(create: (_)=>WeatherProvider())
-      ],
-      child: MaterialApp(
+    return  MaterialApp(
         title: 'Weather App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -43,8 +44,7 @@ class MyApp extends StatelessWidget {
         routes: {
           WeatherPage.routeName:(context)=>WeatherPage()
         },
-      ),
-    );
+      );
   }
 }
 

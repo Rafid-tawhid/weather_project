@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 import '../helpers/constants.dart';
 import '../helpers/helper_function.dart';
@@ -17,18 +18,21 @@ class WeatherPage extends StatefulWidget {
 
 class _WeatherPageState extends State<WeatherPage> {
   late WeatherProvider provider;
-
+  bool isFirst = true;
 
 
   @override
   void initState() {
-    _getData();
     super.initState();
   }
 
-@override
+  @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
+    if(isFirst) {
+      provider = Provider.of<WeatherProvider>(context);
+      _getData();
+      isFirst = false;
+    }
     super.didChangeDependencies();
   }
 
@@ -38,7 +42,7 @@ class _WeatherPageState extends State<WeatherPage> {
       child: Scaffold(
         body: Container(
           alignment: Alignment.topCenter,
-
+      
           child: provider.hasDataLoaded ? ListView(
             shrinkWrap: true,
             padding: const EdgeInsets.all(8),
@@ -72,7 +76,7 @@ class _WeatherPageState extends State<WeatherPage> {
                   if(result!=null&&result.isNotEmpty){
                     provider.convertAddressToLatLng(result);
                   }
-                }, icon: Icon(Icons.search)),
+                }, icon: Icon(Icons.search,color: Colors.black,)),
                 IconButton(onPressed: (){
                   _getData();
                 }, icon: Icon(Icons.location_on_outlined,color: Colors.black,)),
@@ -135,7 +139,7 @@ class _WeatherPageState extends State<WeatherPage> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        //SvgPicture.asset('images/min.svg',height: 32,width: 32,color: Colors.black,),
+                        SvgPicture.asset('images/min.svg',height: 32,width: 32,color: Colors.black,),
                         SizedBox(width: 10,),
                         Column(
                           mainAxisSize: MainAxisSize.min,
@@ -358,7 +362,7 @@ class _WeatherPageState extends State<WeatherPage> {
 
           ],
         ),
-
+      
 
       ],
     );
@@ -384,6 +388,8 @@ class _WeatherPageState extends State<WeatherPage> {
       rethrow;
     }
   }
+
+ 
 
 
 
