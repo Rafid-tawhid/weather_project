@@ -40,20 +40,61 @@ class _WeatherPageState extends State<WeatherPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          alignment: Alignment.topCenter,
-      
-          child: provider.hasDataLoaded ? ListView(
-            shrinkWrap: true,
-            padding:  EdgeInsets.all(8),
-            children: [
-              SizedBox(height: 30,),
-              _currentWeatherSection(),
-              ...provider.forecastList!.map((e) => ListTile(title: Text(e.wind!.speed!.toString()),))
-            ],
-          ) :
-          Center(child: Text('Please wait...',style: TextStyle(color: Colors.black),)),
-        ),
+        body: provider.hasDataLoaded ? SingleChildScrollView(
+          child: Container(
+            alignment: Alignment.topCenter,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 30,),
+                _currentWeatherSection(),
+                Container(
+                  height: 200,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    shrinkWrap: true,
+                    itemCount: provider.forecastList.length,
+                    itemBuilder: (context,index)=>
+                        Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Card(
+                            elevation: 5,
+                            child: Container(
+                              height: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10)
+                              ),
+                              width: 100,
+                              alignment: Alignment.center,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(provider.forecastList[index].weather!.first.main??'Rain'),
+                                  SizedBox(height: 10,),
+                                  Text(provider.forecastList[index]!.main!.temp.toString()+degree,style: TextStyle(fontSize: 22,fontWeight: FontWeight.bold),),
+                                  SizedBox(height: 10,),
+                                  Text('Humidity : ${provider.forecastList[index].main!.humidity??''}',style: TextStyle(fontSize: 10),),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                  ),
+                ),
+                SizedBox(height: 100,)
+              ],
+            )
+          ),
+        ):Center(child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 10,),
+            Text('Please wait...',style: TextStyle(color: Colors.black),),
+          ],
+        )),
       ),
     );
   }
@@ -402,6 +443,9 @@ class _WeatherPageState extends State<WeatherPage> {
 
 
 class _CitySearchDelegate extends SearchDelegate<String> {
+
+  @override
+  String get searchFieldLabel => 'search city';
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
@@ -416,6 +460,7 @@ class _CitySearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget? buildLeading(BuildContext context) {
+
     IconButton(
       onPressed: () {
         close(context, '');

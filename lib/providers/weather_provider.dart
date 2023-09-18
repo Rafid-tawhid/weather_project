@@ -16,7 +16,7 @@ import '../models/forecast_response_model.dart';
 class WeatherProvider extends ChangeNotifier{
   CurrentResponseModel? currentResponseModel;
   ForecastModel? forecastResponseModel;
-  List<ForecastList> forecastList=[];
+  List<ForcastList> forecastList=[];
   double latitude = 0.0, longitude = 0.0;
   String unit = 'metric';
   String unitSymbol = celsius;
@@ -77,6 +77,7 @@ class WeatherProvider extends ChangeNotifier{
         currentResponseModel = CurrentResponseModel.fromJson(map);
         print(currentResponseModel!.main!.temp!.round());
         notifyListeners();
+        print('CURRENT DATA CALLED');
       } else {
         print(map['message']);
       }
@@ -87,15 +88,18 @@ class WeatherProvider extends ChangeNotifier{
 
 void _getForecastData() async {
   final uri = Uri.parse('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$longitude&units=$unit&appid=$weather_api_key');
+  print('URI ${uri}');
+  forecastList.clear();
   try {
     final response = await get(uri);
     final map = jsonDecode(response.body);
     if(response.statusCode == 200) {
       forecastResponseModel = ForecastModel.fromJson(map);
       for(Map<String,dynamic> i in map['list']){
-        forecastList.add(ForecastList.fromJson(i));
+        forecastList.add(ForcastList.fromJson(i));
       }
-      print(forecastList.length);
+      print('forecastList.length ${forecastList.length}');
+      print('FORECAST DATA CALLED');
       notifyListeners();
     } else {
       print(map['message']);
